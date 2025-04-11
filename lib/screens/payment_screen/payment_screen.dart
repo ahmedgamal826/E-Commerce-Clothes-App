@@ -1,5 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:e_commerce_app/constants/app_colors.dart';
+import 'package:e_commerce_app/screens/payment_screen/widgets/custom_confirm_payment_button.dart';
+import 'package:e_commerce_app/screens/payment_screen/widgets/custom_payment_option.dart';
 import 'package:flutter/material.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -12,168 +14,19 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  String _selectedPaymentMethod = 'Amazon Pay'; // طريقة الدفع الافتراضية
+  String _selectedPaymentMethod = 'Amazon Pay';
 
-  @override
-  Widget build(BuildContext context) {
-    const double shippingFee = 15.00; // رسوم الشحن ثابتة
-    final double subTotal = widget.totalPrice; // السعر الفرعي
-    final double totalPayment = subTotal + shippingFee; // السعر الإجمالي
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text(
-          'Product Overview',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Payment Methods
-            _buildPaymentOption(
-              'Amazon Pay',
-              'assets/images/amazon_pay_logo.png', // افترضنا مسار للصورة
-              _selectedPaymentMethod == 'Amazon Pay',
-              () {
-                setState(() {
-                  _selectedPaymentMethod = 'Amazon Pay';
-                });
-              },
-            ),
-            _buildPaymentOption(
-              'Credit Card',
-              'assets/images/credit_card_logo-removebg-preview (1).png', // افترضنا مسار للصورة
-              _selectedPaymentMethod == 'Credit Card',
-              () {
-                setState(() {
-                  _selectedPaymentMethod = 'Credit Card';
-                });
-              },
-            ),
-            _buildPaymentOption(
-              'PayPal',
-              'assets/images/paypal_logo.png', // افترضنا مسار للصورة
-              _selectedPaymentMethod == 'PayPal',
-              () {
-                setState(() {
-                  _selectedPaymentMethod = 'PayPal';
-                });
-              },
-            ),
-            _buildPaymentOption(
-              'Google Pay',
-              'assets/images/google_pay_logo.png', // افترضنا مسار للصورة
-              _selectedPaymentMethod == 'Google Pay',
-              () {
-                setState(() {
-                  _selectedPaymentMethod = 'Google Pay';
-                });
-              },
-            ),
-            const Spacer(),
-            // Price Details
-            _buildPriceRow('Sub-Total', subTotal),
-            _buildPriceRow('Shipping Fee', shippingFee),
-            const Divider(
-              color: Colors.black,
-              thickness: 2,
-            ),
-            _buildPriceRow('Total Payment', totalPayment, isTotal: true),
-            const SizedBox(height: 16),
-            // Confirm Payment Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _showConfirmationDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'Confirm Payment',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentOption(
-      String title, String logoPath, bool isSelected, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected ? AppColors.primaryColor : Colors.grey,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              Radio(
-                value: title,
-                groupValue: _selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethod = value.toString();
-                  });
-                },
-                activeColor: AppColors.primaryColor,
-              ),
-              Text(
-                title,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const Spacer(),
-              Image.asset(
-                logoPath,
-                height: 50,
-                // errorBuilder: (context, error, stackTrace) {
-                //   return const SizedBox(
-                //     height: 30,
-                //     width: 60,
-                //     child: Center(child: Text('Logo')),
-                //   );
-                // },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void _showConfirmationDialog(BuildContext context) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.scale,
+      title: 'Purchase Completed',
+      desc: 'Thank you for your purchase!',
+      btnOkOnPress: () {
+        Navigator.pop(context); // Go back after confirming
+      },
+    ).show();
   }
 
   Widget _buildPriceRow(String title, double price, {bool isTotal = false}) {
@@ -202,16 +55,133 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context) {
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.success,
-      animType: AnimType.scale,
-      title: 'Purchase Completed',
-      desc: 'Thank you for your purchase!',
-      btnOkOnPress: () {
-        Navigator.pop(context); // Go back after confirming
-      },
-    ).show();
+  @override
+  Widget build(BuildContext context) {
+    const double shippingFee = 15.00;
+    final double subTotal = widget.totalPrice;
+    final double totalPayment = subTotal + shippingFee;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Payment',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select Payment Method',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              CustomPaymentOption(
+                title: 'Amazon Pay',
+                logoPath: 'assets/images/amazon_pay_logo.png',
+                isSelected: _selectedPaymentMethod == 'Amazon Pay',
+                onTap: () {
+                  setState(() {
+                    _selectedPaymentMethod = 'Amazon Pay';
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPaymentMethod = value ?? 'Amazon Pay';
+                  });
+                },
+                groupValue: _selectedPaymentMethod,
+              ),
+              CustomPaymentOption(
+                title: 'Credit Card',
+                logoPath:
+                    'assets/images/credit_card_logo-removebg-preview (1).png',
+                isSelected: _selectedPaymentMethod == 'Credit Card',
+                onTap: () {
+                  setState(() {
+                    _selectedPaymentMethod = 'Credit Card';
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPaymentMethod = value ?? 'Credit Card';
+                  });
+                },
+                groupValue: _selectedPaymentMethod,
+              ),
+
+              CustomPaymentOption(
+                title: 'PayPal',
+                logoPath: 'assets/images/paypal_logo.png',
+                isSelected: _selectedPaymentMethod == 'PayPal',
+                onTap: () {
+                  setState(() {
+                    _selectedPaymentMethod = 'PayPal';
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPaymentMethod = value ?? 'PayPal';
+                  });
+                },
+                groupValue: _selectedPaymentMethod,
+              ),
+              CustomPaymentOption(
+                title: 'Google Pay',
+                logoPath: 'assets/images/google_pay_logo.png',
+                isSelected: _selectedPaymentMethod == 'Google Pay',
+                onTap: () {
+                  setState(() {
+                    _selectedPaymentMethod = 'Google Pay';
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _selectedPaymentMethod = value ?? 'Google Pay';
+                  });
+                },
+                groupValue: _selectedPaymentMethod,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Price Details',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              _buildPriceRow('Sub-Total', subTotal),
+              _buildPriceRow('Shipping Fee', shippingFee),
+              const Divider(
+                color: Colors.black,
+                thickness: 2,
+              ),
+              _buildPriceRow('Total Payment', totalPayment, isTotal: true),
+              const SizedBox(height: 16),
+              CustomConfirmPaymentButton(
+                onPressed: () {
+                  _showConfirmationDialog(context);
+                },
+              ),
+              const SizedBox(height: 16), // Extra padding at the bottom
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
